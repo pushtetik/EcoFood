@@ -461,4 +461,3 @@ pending → processing → cooking → delivering → delivered
 
 ---
 
-<p align="center">Сделано с 💚 для тех, кто выбирает правильное питание</p>
