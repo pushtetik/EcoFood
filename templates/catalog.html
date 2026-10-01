@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<section class="catalog-section py-4 py-md-5">
+    <div class="container">
+        <div class="row mb-4 mb-md-5">
+            <div class="col-12 text-center">
+                <h1 class="fw-bold text-success mb-2">Каталог продуктов</h1>
+                <p class="text-muted mb-0">Свежие и экологически чистые продукты</p>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="search-container position-relative">
+                    <input type="text" class="form-control search-input" placeholder="Поиск продуктов..." id="searchInput">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="mobile-categories-container">
+            <div class="mobile-categories-header" id="mobileCategoriesToggle">
+                <h5>
+                    <i class="fas fa-filter me-2"></i>
+                    Категории
+                </h5>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="mobile-categories-content" id="mobileCategoriesContent">
+                <div class="mobile-categories-grid">
+                    <div class="mobile-category-item active" data-category="all">
+                        <input class="form-check-input mobile-category-checkbox" 
+                               type="checkbox" 
+                               id="mobile-category-all" 
+                               value="all" 
+                               checked>
+                        <label class="mobile-category-label" for="mobile-category-all">
+                            Все категории
+                        </label>
+                    </div>
+                    {% for category in categories %}
+                    <div class="mobile-category-item" data-category="{{ category.slug }}">
+                        <input class="form-check-input mobile-category-checkbox" 
+                               type="checkbox" 
+                               id="mobile-category-{{ category.slug }}" 
+                               value="{{ category.slug }}" 
+                               checked>
+                        <label class="mobile-category-label" for="mobile-category-{{ category.slug }}">
+                            {{ category.name }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="catalog-layout">
+            <aside class="categories-sidebar">
+                <h5>Категории</h5>
+                <ul class="category-list">
+                    <li class="category-item">
+                        <div class="category-checkbox-wrapper">
+                            <input class="form-check-input category-checkbox" 
+                                   type="checkbox" 
+                                   id="category-all" 
+                                   value="all" 
+                                   checked>
+                            <label class="form-check-label" for="category-all">
+                                Все категории
+                            </label>
+                        </div>
+                    </li>
+                    {% for category in categories %}
+                    <li class="category-item">
+                        <div class="category-checkbox-wrapper">
+                            <input class="form-check-input category-checkbox" 
+                                   type="checkbox" 
+                                   id="category-{{ category.slug }}" 
+                                   value="{{ category.slug }}" 
+                                   checked>
+                            <label class="form-check-label" for="category-{{ category.slug }}">
+                                {{ category.name }}
+                            </label>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </aside>
+            <main class="catalog-content">
+                <div class="filters-topbar">
+                    <h5>Товары ({{ products|length }})</h5>
+                    <div class="sort-group">
+                        <label for="sortSelect">Сортировка:</label>
+                        <select class="form-select sort-select" id="sortSelect">
+                            <option value="default">По умолчанию</option>
+                            <option value="price-asc">По цене (от низкой к высокой)</option>
+                            <option value="price-desc">По цене (от высокой к низкой)</option>
+                            <option value="name-asc">По названию (А-Я)</option>
+                            <option value="name-desc">По названию (Я-А)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="products-grid" id="productsGrid">
+                    {% for product in products %}
+                    <div class="product-card" data-category="{{ product.category.slug }}" data-name="{{ product.name|lower }}" data-price="{{ product.price }}">
+                        <div class="product-image">
+                            <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy">
+                        </div>
+                        <div class="product-content">
+                            <div class="product-category">{{ product.category.name }}</div>
+                            <h3 class="product-title">{{ product.name }}</h3>
+                            <p class="product-description">{{ product.description|truncatewords:8 }}</p>
+                            <div class="product-meta">
+                                <div class="product-price">
+                                    <span class="current-price">{{ product.price }} ₽</span>
+                                    {% if product.old_price %}
+                                    <span class="old-price">{{ product.old_price }} ₽</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="product-actions">
+                                <a href="{% url 'catalog:product_detail' product.id %}" class="btn-view">
+                                    Подробнее
+                                </a>
+                                <button class="btn-cart add-to-cart-btn" 
+                                        data-product-id="{{ product.id }}"
+                                        data-product-name="{{ product.name }}"
+                                        data-product-price="{{ product.price }}"
+                                        data-product-image="{{ product.image }}"
+                                        {% if not product.in_stock %}disabled{% endif %}>
+                                    {% if product.in_stock %}В корзину{% else %}Нет в наличии{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="alert alert-info d-none" id="noProductsMessage">
+                    <h4>Товары не найдены</h4>
+                    <p>Попробуйте изменить параметры поиска или фильтры</p>
+                </div>
+            </main>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/catalog.css' %}">
+<style>
+    @media (max-width: 991px) {
+        .categories-sidebar {
+            display: none !important;
+        }
+        .mobile-categories-container {
+            display: block !important;
+        }
+    }
+    
+    @media (min-width: 992px) {
+        .categories-sidebar {
+            display: block !important;
+        }
+        .mobile-categories-container {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/catalog.js' %}"></script>
+<script src="{% static 'js/cart.js' %}"></script>
+{% endblock %}

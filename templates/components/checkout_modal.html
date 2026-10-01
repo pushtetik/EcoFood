@@ -1,0 +1,170 @@
+{% load static %}
+<link href="https://cdn.jsdelivr.net/npm/@dadata/suggestions@25.4.1/dist/suggestions.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@dadata/suggestions@25.4.1/dist/suggestions.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+
+<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="checkoutModalLabel">Оформление заказа</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="checkoutForm">
+                    {% csrf_token %}
+                    
+
+                    <div class="mb-4">
+                        <label for="deliveryAddress" class="form-label fw-bold">Адрес доставки *</label>
+                        <div class="position-relative">
+                            <input type="text" class="form-control" id="deliveryAddress" name="address" 
+                                   placeholder="Введите ваш адрес в Санкт-Петербурге" required
+                                   autocomplete="off">
+                            <div id="addressSuggestions" class="suggestions-wrapper d-none"></div>
+                        </div>
+                      <div class="row g-0">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="apartment" class="form-label">Квартира/Офис</label>
+                                <input type="text" class="form-control" id="apartment" name="apartment" 
+                                    placeholder="Номер квартиры или офиса"
+                                    pattern="\d*" 
+                                    title="Введите только цифры"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <div class="form-text">Необязательно для частных домов. Только цифры</div>
+                                <div id="apartmentError" class="text-danger small d-none">
+                                    <i class="bi bi-exclamation-circle me-1"></i>Номер квартиры должен содержать только цифры
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="deliveryComment" class="form-label">Комментарий к заказу</label>
+                        <textarea class="form-control" id="deliveryComment" name="delivery_comment" 
+                                rows="3" placeholder="Например: код домофона, этаж, дополнительные пожелания..."></textarea>
+                        <div class="form-text">Любая информация, которая поможет курьеру найти вас</div>
+                    </div>
+                        <div class="form-text">Мы находимся в Лахта Центре. Доставка доступна только в пределах Санкт-Петербурга</div>
+                        
+                        <div id="addressWarning" class="address-warning d-none">
+                            <i class="bi bi-exclamation-triangle me-1"></i>Уточните номер дома для точного расчета доставки
+                        </div>
+                        
+                        <div id="deliveryInfo" class="delivery-zone-info d-none mt-2">
+                            <span id="deliveryText"></span>
+                            <span id="deliveryCost"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Зона доставки</label>
+                        <div id="deliveryMap">
+                            <script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A1ce7077f1da4ab6eb13eebbd5a5890938dd1d323c848f99ab1b97b411fa7a496&amp;width=100%&amp;height=400&amp;lang=ru_RU&amp;scroll=true"></script>
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">Карта показывает зону доставки в Санкт-Петербурге</small>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Способ оплаты *</label>
+                        <div id="paymentMethods">
+                            <div class="payment-method" data-method="cash">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-cash-coin payment-icon"></i>
+                                    <div>
+                                        <div class="fw-medium">Наличными при получении</div>
+                                        <div class="payment-info">Оплата наличными курьеру при доставке заказа</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-method" data-method="card">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-credit-card payment-icon"></i>
+                                    <div>
+                                        <div class="fw-medium">Банковской картой онлайн</div>
+                                        <div class="payment-info">Оплата картой Visa, Mastercard, МИР через безопасный платежный шлюз</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-method" data-method="card_courier">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-phone payment-icon"></i>
+                                    <div>
+                                        <div class="fw-medium">Картой курьеру</div>
+                                        <div class="payment-info">Оплата банковской картой через мобильный терминал при получении</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selectedPaymentMethod" name="payment_method" required>
+                    </div>
+                    <div class="mb-4 promocode-section">
+                        <label class="form-label fw-bold">Промокод</label>
+                        <div class="promocode-input-group">
+                            <input type="text" class="form-control promocode-input" id="promocodeInput" 
+                                   placeholder="Введите промокод" maxlength="20">
+                            <button type="button" class="btn btn-outline-primary" id="applyPromocodeBtn" onclick="applyPromocode()">
+                                Применить
+                            </button>
+                        </div>
+                        <div id="promocodeStatus" class="promocode-status"></div>
+                        <div class="form-text">
+                            Введите промокод для получения скидки. Промокод действует от определенной суммы заказа.
+                        </div>
+                    </div>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">Итоги заказа</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Товары:</span>
+                                <span id="modalItemsTotal">0 ₽</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Доставка:</span>
+                                <span id="deliveryPrice">Расчет...</span>
+                            </div>
+                            
+                            <div id="discountRow" class="d-flex justify-content-between mb-2 d-none">
+                                <span>Скидка по промокоду:</span>
+                                <span id="discountAmount" class="text-success">0 ₽</span>
+                            </div>
+                            
+                            <hr>
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Итого:</span>
+                                <span id="modalFinalTotal">0 ₽</span>
+                            </div>
+                            
+                            <div id="appliedPromocodeInfo" class="mt-2 d-none">
+                                <small class="text-muted">
+                                    <i class="bi bi-tag me-1"></i>
+                                    Применен промокод: <span id="appliedPromocodeName"></span>
+                                    <span id="appliedPromocodeDiscount" class="discount-badge"></span>
+                                    <button type="button" class="btn btn-sm btn-link p-0 ms-2" onclick="removePromocode()">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-success" id="submitOrderBtn" onclick="submitOrder()" disabled>
+                    <i class="bi bi-bag-check me-2"></i>Оформить заказ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/static/js/checkout.js"></script>
+
+<script>
+    window.ORDER_CREATE_URL = "{% url 'orders:order_create' %}";
+    window.APPLY_PROMOCODE_URL = "{% url 'orders:apply_promocode' %}";
+</script>

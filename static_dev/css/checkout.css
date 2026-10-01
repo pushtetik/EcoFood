@@ -1,0 +1,145 @@
+
+#deliveryMap {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    height: 400px;
+    width: 100%;
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    #deliveryMap {
+        height: 300px;
+    }
+    
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+}
+
+.suggestions-wrapper {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestion-item:hover {
+    background-color: #f8f9fa;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.delivery-error {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.delivery-success {
+    color: #198754;
+    font-weight: 500;
+}
+
+.address-warning {
+    color: #fd7e14;
+    font-size: 0.875em;
+    margin-top: 4px;
+}
+
+/* Стили для выбора способа оплаты */
+.payment-method {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-method:hover {
+    border-color: #6c757d;
+    background-color: #f8f9fa;
+}
+
+.payment-method.selected {
+    border-color: #198754;
+    background-color: #f8fff9;
+}
+
+.payment-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+    color: #6c757d;
+}
+
+.payment-method.selected .payment-icon {
+    color: #198754;
+}
+
+.payment-info {
+    font-size: 0.875em;
+    color: #6c757d;
+    margin-top: 4px;
+}
+
+/* Стили для промокода */
+.promocode-section {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 16px;
+    background-color: #f8f9fa;
+    margin-bottom: 20px;
+}
+
+.promocode-input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.promocode-input {
+    flex: 1;
+}
+
+.promocode-status {
+    font-size: 0.875em;
+    margin-top: 4px;
+    min-height: 20px;
+}
+
+.promocode-success {
+    color: #198754;
+    font-weight: 500;
+}
+
+.promocode-error {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.promocode-info {
+    color: #6c757d;
+}
+
+.discount-badge {
+    background-color: #198754;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    margin-left: 8px;
+}
+

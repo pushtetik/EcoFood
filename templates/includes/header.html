@@ -1,0 +1,194 @@
+{% load static %}
+<header class="py-2">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-6 col-lg-3 d-flex align-items-center">
+        <a class="text-decoration-none" href="{% url 'index' %}">
+          <h1 class="text-success mb-0 fw-bold h5 h4-md h3-lg">EcoFood</h1>
+          <small class="text-success small-xs small">Правильное питание</small>
+        </a>
+      </div>
+
+      <div class="col-6 d-lg-none text-end">
+        <div class="d-flex align-items-center justify-content-end">
+          <a href="{% url 'catalog:cart' %}" class="btn btn-outline-success position-relative me-2">
+            <img src="{% static 'img/icons/cart.png' %}" alt="Корзина" class="cart-icon-img">
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCountMobile">
+              0
+            </span>
+          </a>
+          
+          <button class="navbar-toggler p-1" type="button"
+                  data-bs-toggle="offcanvas" 
+                  data-bs-target="#sidebar"
+                  aria-controls="sidebar">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block">
+        <ul class="nav nav-pills nav-green justify-content-center mb-0">
+          {% with request.resolver_match.url_name as url_name %}
+          <li class="nav-item">
+            <a class="nav-link {% if url_name == 'index' %}active bg-success text-white{% else %}text-success{% endif %} border-0" 
+               href="{% url 'index' %}">Главная</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if url_name == 'catalog' %}active bg-success text-white{% else %}text-success{% endif %}" 
+               href="{% url 'catalog:catalog' %}">Каталог</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if url_name == 'delivery' %}active bg-success text-white{% else %}text-success{% endif %}" 
+               href="{% url 'delivery:delivery' %}">Доставка</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if url_name == 'about' %}active bg-success text-white{% else %}text-success{% endif %}" 
+                 href="{% url 'about:about' %}">О нас</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if url_name == 'contacts' %}active bg-success text-white{% else %}text-success{% endif %}" 
+               href="{% url 'contacts:contacts' %}">Контакты</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if url_name == 'reviews' %}active bg-success text-white{% else %}text-success{% endif %}" 
+               href="{% url 'reviews:reviews' %}">Отзывы</a>
+          </li>
+          {% endwith %}
+        </ul>
+      </div>
+
+      <div class="col-lg-3 d-none d-lg-flex justify-content-end align-items-center">
+        <a href="{% url 'catalog:cart' %}" class="btn btn-outline-success position-relative me-3">
+          <img src="{% static 'img/icons/cart.png' %}" alt="Корзина" class="cart-icon-img">
+          <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            0
+          </span>
+        </a>
+        
+        {% if user.is_authenticated %}
+        <div class="dropdown">
+          <button class="btn btn-outline-success dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+            Мой аккаунт
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <div class="dropdown-header text-success">
+                <strong>{{ user.first_name|default:user.phone }}</strong>
+                <div class="small text-muted">{{ user.phone }}</div>
+              </div>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="bi bi-person me-2"></i>Профиль</a></li>
+            <li><a class="dropdown-item" href="{% url 'orders:order_list' %}"><i class="bi bi-bag me-2"></i>Мои заказы</a></li>
+
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form method="post" action="{% url 'logout' %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item text-danger">
+                  <i class="bi bi-box-arrow-right me-2"></i>Выйти
+                </button>
+              </form>
+            </li>
+          </ul>
+        </div>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-success me-2">Войти</a>
+        <a href="{% url 'register' %}" class="btn btn-success">Зарегистрироваться</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title text-success mb-0 sidebar-title">Меню</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      {% if user.is_authenticated %}
+      <div class="user-info-top mb-4 p-3 bg-success text-white rounded">
+        <div class="d-flex align-items-center mb-2">
+          <i class="bi bi-person-circle me-2 fs-4"></i>
+          <div>
+            <strong>{{ user.first_name|default:user.phone }}</strong>
+            <div class="small">{{ user.phone }}</div>
+          </div>
+        </div>
+        <div class="d-grid gap-2">
+          <a href="{% url 'profile' %}" class="btn btn-light w-100 mb-2 sidebar-btn">
+            <i class="bi bi-person me-2"></i>Профиль
+          </a>
+          <a href="{% url 'orders:order_list' %}" class="btn btn-light w-100 sidebar-btn">
+            <i class="bi bi-bag me-2"></i>Мои заказы
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+      <ul class="navbar-nav nav-pills nav-green">
+        {% with request.resolver_match.url_name as url_name %}
+        <li class="nav-item">
+          <a class="nav-link {% if url_name == 'index' %}active bg-success text-white{% else %}text-success{% endif %} sidebar-link" 
+             href="{% url 'index' %}">Главная</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if url_name == 'catalog' %}active bg-success text-white{% else %}text-success{% endif %} sidebar-link" 
+             href="{% url 'catalog:catalog' %}">Каталог</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if url_name == 'delivery' %}active bg-success text-white{% else %}text-success{% endif %} sidebar-link" 
+             href="{% url 'delivery:delivery' %}">Доставка</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if url_name == 'about' %}active bg-success text-white{% else %}text-success{% endif %} sidebar-link" 
+               href="{% url 'about:about' %}">О нас</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if url_name == 'contacts' %}active bg-success text-white{% else %}text-success{% endif %} sidebar-link" 
+             href="{% url 'contacts:contacts' %}">Контакты</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if url_name == 'reviews' %}active bg-success text-white{% else %}text-success{% endif %} sidebar-link" 
+             href="{% url 'reviews:reviews' %}">Отзывы</a>
+        </li>
+        {% endwith %}
+      </ul>
+      
+      <div class="mt-3 mb-4">
+        <a href="{% url 'catalog:cart' %}" class="btn btn-outline-success position-relative w-100">
+          <img src="{% static 'img/icons/cart.png' %}" alt="Корзина" class="cart-icon-img me-2">
+          Корзина
+          <span id="cartCountSidebar" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            0
+          </span>
+        </a>
+      </div>
+      
+      {% if not user.is_authenticated %}
+      <hr class="my-4">
+      <div class="auth-buttons">
+        <a href="{% url 'login' %}" class="btn btn-outline-success w-100 mb-2 sidebar-btn">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Войти
+        </a>
+        <a href="{% url 'register' %}" class="btn btn-success w-100 sidebar-btn">
+          <i class="bi bi-person-plus me-2"></i>Зарегистрироваться
+        </a>
+      </div>
+      {% else %}
+      <hr class="my-4">
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger w-100 sidebar-btn">
+          <i class="bi bi-box-arrow-right me-2"></i>Выйти
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
+<script src="{% static 'js/cart.js' %}"></script>
+
+

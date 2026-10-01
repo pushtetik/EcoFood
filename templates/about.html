@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+<section class="section-about py-5">
+    <div class="container">
+        <div class="row align-items-center">
+
+            <div class="col-lg-6 mb-4 mb-lg-0 d-none d-lg-block">
+                <div class="about-image-wrapper">
+                    <img src="https://vestnikapk.ru/upload/medialibrary/5bc/gtsikl72jkmhcciw43jqju5c0ai4en1g/otdel_pravilnoe_pitanie.jpg" 
+                         class="img-fluid rounded-3 shadow-lg" 
+                         alt="Натуральные продукты">
+                    <div class="floating-badge">
+                        <span class="badge-text">С 2015 года</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="about-content">
+                    <span class="section-subtitle">О нашем магазине</span>
+                    <h2 class="section-title fw-bold text-success mb-4">Почему выбирают нас?</h2>
+                    
+                    <p class="about-lead mb-4">
+                        Мы не просто продаем продукты — мы создаем осознанную культуру питания. 
+                        Более 10 лет мы помогаем нашим клиентам питаться правильно и вкусно.
+                    </p>
+                    
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <div class="feature-icon">🌱</div>
+                            <div class="feature-content">
+                                <h5>Прямые поставки от фермеров</h5>
+                                <p>Свежие продукты напрямую от проверенных поставщиков</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">♻️</div>
+                            <div class="feature-content">
+                                <h5>Экологичная упаковка</h5>
+                                <p>Заботимся о природе вместе с нашими клиентами</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">🚚</div>
+                            <div class="feature-content">
+                                <h5>Быстрая доставка</h5>
+                                <p>Доставляем в кратчайшие сроки</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">⭐</div>
+                            <div class="feature-content">
+                                <h5>Гарантия свежести</h5>
+                                <p>Все продукты проходят строгий контроль качества</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-row mt-4">
+                        <div class="stat">
+                            <div class="stat-number">500+</div>
+                            <div class="stat-label">позиций в ассортименте</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">100+</div>
+                            <div class="stat-label">собственных товаров</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">10+</div>
+                            <div class="stat-label">лет на рынке</div>
+                        </div>
+                    </div>
+                    
+                    <div class="cta-buttons mt-4">
+                        <a href="{% url 'catalog:catalog' %}" class="btn btn-outline-success btn-lg">
+                            Смотреть каталог
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}

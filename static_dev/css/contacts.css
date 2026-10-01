@@ -1,0 +1,143 @@
+
+.contacts-section {
+    background: #f8fff8;
+    min-height: 100vh;
+}
+
+.contacts-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    height: 100%;
+}
+
+.contact-info-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: #f8fff8;
+    border-radius: 8px;
+    border-left: 3px solid #4caf50;
+}
+
+.contact-info-icon {
+    font-size: 1.2em;
+    flex-shrink: 0;
+}
+
+.contact-info-content h5 {
+    color: #2c5e2e;
+    margin-bottom: 4px;
+    font-size: 1em;
+}
+
+.contact-info-content p,
+.contact-info-content a {
+    color: #555;
+    margin: 0;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.contact-info-content a:hover {
+    color: #2c5e2e;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.social-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    font-size: 0.9em;
+    background: #4caf50;
+    transition: background 0.3s ease;
+}
+
+.social-btn:hover {
+    background: #2c5e2e;
+    color: white;
+}
+
+.map-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    height: 100%;
+}
+
+.map-container {
+    border-radius: 8px;
+    overflow: hidden;
+    height: 400px;
+    position: relative;
+    border: 1px solid #ddd;
+}
+
+.map-details {
+    background: #f8fff8;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.map-detail-item h6 {
+    color: #2c5e2e;
+    margin-bottom: 4px;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.map-detail-item p {
+    color: #666;
+    margin: 0;
+    font-size: 0.85em;
+}
+
+@media (max-width: 768px) {
+    .contacts-section {
+        padding: 20px 0;
+    }
+    
+    .contacts-card,
+    .map-card {
+        padding: 15px;
+    }
+    
+    .map-container {
+        height: 300px;
+    }
+    
+    .social-buttons {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    h3 {
+        font-size: 1.3em;
+    }
+    
+    .social-btn {
+        flex: 1;
+        text-align: center;
+        min-width: 100px;
+    }
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EcoFood{% endblock %}</title>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            margin: 0; 
+            padding: 0; 
+            background: #f5f5f5;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: white;
+        }
+        .header { 
+            background: linear-gradient(135deg, #198754, #146c43); 
+            color: white; 
+            padding: 30px 20px; 
+            text-align: center; 
+        }
+        .content { 
+            padding: 30px; 
+            background: white;
+        }
+        .footer { 
+            padding: 20px; 
+            text-align: center; 
+            font-size: 12px; 
+            color: #666; 
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        .button { 
+            display: inline-block; 
+            padding: 14px 28px; 
+            background: #198754; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            margin: 20px 0; 
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        .code { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 5px; 
+            border-left: 4px solid #198754;
+            margin: 15px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="margin: 0; font-size: 28px;">🛒 EcoFood</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Магазин правильных продуктов</p>
+        </div>
+        
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+        
+        <div class="footer">
+            <p style="margin: 0;">Это письмо было отправлено автоматически. Пожалуйста, не отвечайте на него.</p>
+            <p style="margin: 10px 0 0 0;">
+                🛒 EcoFood — Правильное питание для всей семьи<br>
+                &copy; 2025 EcoFood. Все права защищены.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

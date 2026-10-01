@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+<section class="product-details-section py-3 py-md-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                <div class="product-detail-card">
+                    <div class="row g-4">
+                        <!-- Изображение товара -->
+                        <div class="col-12 col-md-6">
+                            <div class="product-detail-image">
+                                <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy">
+                            </div>
+                        </div>
+
+                        <!-- Информация о товаре -->
+                        <div class="col-12 col-md-6">
+                            <div class="product-detail-info">
+                            
+                                <div class="product-category mb-2">
+                                    {{ product.category_display }}
+                                </div>
+
+                                <h1 class="product-detail-title mb-3">
+                                    {{ product.name }}
+                                </h1>
+
+                                <div class="product-detail-price mb-4">
+                                    {% if product.price %}
+                                        <span class="current-price">{{ product.price }} ₽</span>
+                                        {% if product.old_price %}
+                                        <span class="old-price text-muted text-decoration-line-through ms-2">{{ product.old_price }} ₽</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="current-price">Цена уточняется</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="product-detail-description mb-4">
+                                    <h3 class="description-title mb-3">Описание</h3>
+                                    <p class="description-text">
+                                        {{ product.description }}
+                                    </p>
+                                </div>
+
+                                <!-- Кнопки действий -->
+                                <div class="product-detail-actions">
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-12 col-sm-6">
+                                            {% if product.in_stock %}
+                                                <button class="btn-add-to-cart w-100 add-to-cart-btn"
+                                                        data-product-id="{{ product.id }}"
+                                                        data-product-name="{{ product.name }}"
+                                                        data-product-price="{{ product.price }}"
+                                                        data-product-image="{{ product.image }}">
+                                                    <i class="fas fa-shopping-cart me-2"></i>
+                                                    Добавить в корзину
+                                                </button>
+                                            {% else %}
+                                                <button class="btn-add-to-cart w-100" disabled>
+                                                    <i class="fas fa-times me-2"></i>
+                                                    Нет в наличии
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                          <a href="{% url 'catalog:catalog' %}" class="btn-back-to-catalog w-100">
+                                                Назад в каталог
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Уведомление о добавлении в корзину -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="cartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-shopping-cart text-success me-2"></i>
+            <strong class="me-auto">Корзина</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Товар добавлен в корзину!
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cart.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализация обработчиков для кнопки добавления в корзину
+    const addToCartBtn = document.querySelector('.add-to-cart-btn');
+    const cartToast = document.getElementById('cartToast');
+    
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            const productName = this.getAttribute('data-product-name');
+            const productPrice = this.getAttribute('data-product-price');
+            const productImage = this.getAttribute('data-product-image');
+            
+            // Добавляем товар в корзину
+            addToCart(productId, productName, productPrice, productImage);
+            
+            // Показываем уведомление
+            const toast = new bootstrap.Toast(cartToast);
+            toast.show();
+            
+            // Обновляем счетчик корзины в шапке
+            updateCartCounter();
+        });
+    }
+    
+    // Функция для обновления счетчика корзины в шапке
+    function updateCartCounter() {
+        const cart = getCart();
+        const cartCounter = document.querySelector('.cart-counter');
+        if (cartCounter) {
+            const totalItems = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+            cartCounter.textContent = totalItems;
+            cartCounter.style.display = totalItems > 0 ? 'flex' : 'none';
+        }
+    }
+});
+</script>
+{% endblock %}

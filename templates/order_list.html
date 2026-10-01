@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Мои заказы - EcoFood{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/order_list.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4 fw-bold text-success">Мои заказы</h1>
+
+    {% if orders %}
+        <div class="orders-list">
+            {% for order in orders %}
+                <div class="order-card" id="order-{{ order.pk }}" style="--order-index: {{ forloop.counter0 }}">
+                    <div class="order-header">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap">
+                            <div>
+                                <div class="order-number">
+                                    Заказ #{{ order.order_number }}
+                                </div>
+                                <div class="order-date">
+                                    {{ order.created_at|date:"d.m.Y H:i" }}
+                                </div>
+                            </div>
+                            <div class="order-status status-{{ order.status }}">
+                                {{ order.get_status_display }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-info">
+                       <div class="order-info-row">
+                        <span class="order-info-label">Адрес доставки:</span>
+                        <span class="order-info-value">
+                            {{ order.delivery_address }}
+                            {% if order.apartment %}
+                                , кв. {{ order.apartment }}
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="order-info-row">
+                        <span class="order-info-label">Оплата:</span>
+                        <span class="order-info-value">{{ order.get_payment_method_display }}</span>
+                    </div>
+
+                    {% if order.promocode %}
+                    <div class="order-info-row">
+                        <span class="order-info-label">Промокод:</span>
+                        <span class="order-info-value text-success">
+                            {{ order.promocode }} (−{{ order.discount_amount|floatformat:2 }} ₽)
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if order.delivery_comment %}
+                <div class="order-comment mt-3 mb-3">
+                    <div class="order-info-row">
+                        <span class="order-info-label">Комментарий:</span>
+                        <span class="order-info-value">
+                            <div class="bg-light p-3 rounded mt-1">
+                                {{ order.delivery_comment|linebreaksbr }}
+                            </div>
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+
+                    <div class="order-items">
+                        <h6 class="mb-3 fw-bold">Состав заказа:</h6>
+                        {% for item in order.items.all %}
+                        <div class="order-item">
+                            <span class="item-name">{{ item.product_name }}</span>
+                            <span class="item-quantity">× {{ item.quantity }}</span>
+                            <span class="item-price">{{ item.total_price|floatformat:2 }} ₽</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="order-total">
+                        <div class="total-row">
+                            <span class="total-label">Товары:</span>
+                            <span class="total-value">{{ order.total_amount|floatformat:2 }} ₽</span>
+                        </div>
+
+                        <div class="total-row">
+                            <span class="total-label">Доставка:</span>
+                            <span class="total-value">
+                                {% if order.delivery_cost == 0 %}
+                                   Бесплатно
+                                {% else %}
+                                   {{ order.delivery_cost|floatformat:2 }} ₽
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        {% if order.discount_amount > 0 %}
+                        <div class="total-row">
+                            <span class="total-label">Скидка:</span>
+                            <span class="total-value text-success">−{{ order.discount_amount|floatformat:2 }} ₽</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="total-row final-total">
+                            <span class="total-label">Итого:</span>
+                            <span class="total-value">{{ order.final_amount|floatformat:2 }} ₽</span>
+                        </div>
+                    </div>
+
+                    <div class="order-actions">
+                        <button class="btn btn-outline-primary" onclick="printOrder('{{ order.pk }}')">
+                            <i class="bi bi-printer me-2"></i>Печать
+                        </button>
+
+                        {% if order.status == 'pending' %}
+                        <form method="post" action="{% url 'orders:cancel_order' order.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" 
+                                    onclick="return confirm('Вы уверены, что хотите отменить заказ?');">
+                                <i class="bi bi-x-circle me-2"></i>Отменить заказ
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-orders">
+            <i class="bi bi-bag-x no-orders-icon"></i>
+            <h3>У вас еще нет заказов</h3>
+            <a href="{% url 'catalog:catalog' %}" class="btn btn-success btn-lg">
+                <i class="bi bi-shop me-2"></i>Перейти в каталог
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+function printOrder(orderId) {
+    const block = document.getElementById('order-' + orderId);
+    if (!block) return;
+    
+    block.classList.add('print-visible');
+    window.print();
+    setTimeout(() => block.classList.remove('print-visible'), 300);
+}
+</script>
+{% endblock %}

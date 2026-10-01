@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="modern-container">
+    {% include "components/hero_section.html" %}
+
+    {% include "components/advantages_section.html" %}
+
+    {% include "components/about_section.html" %}
+
+    {% include "components/gallery_section.html" %}
+</div>
+
+<style>
+.modern-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2vw;
+}
+
+.hero-section,
+.section-advantages,
+.section-about,
+.section-gallery {
+    margin-bottom: 10vw;
+}
+
+
+@keyframes float {
+    30% { transform: translateY(-1vw); }
+}
+
+
+@media (max-width: 768px) {
+    .modern-container {
+        padding: 0 4vw;
+    }
+    
+    .hero-section,
+    .section-advantages,
+    .section-about,
+    .section-gallery {
+        margin-bottom: 12vw;
+    }
+}
+
+@media (max-width: 576px) {
+    .modern-container {
+        padding: 0 4vw;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/reviews.css' %}">
+<div class="reviews-container">
+    <div class="header-container">
+        <div class="title-section">
+            <h1 class="main-title">Мнения о наших продуктах</h1>
+            <p class="subtitle">Поделитесь вашим опытом покупки правильных продуктов</p>
+        </div>
+        
+        {% if user.is_authenticated %}
+            <button class="add-review-btn secondary" onclick="openModal()">
+                Оценить покупку
+            </button>
+        {% else %}
+            <a href="{% url 'login' %}?next={{ request.path }}" class="add-review-btn secondary">
+                Войти, чтобы оставить отзыв
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="reviews-stats">
+        <div class="stat-item">
+            <div class="stat-number">{{ total_reviews }}+</div>
+            <div class="stat-label">Оценок</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ avg_rating }}</div>
+            <div class="stat-label">Общая оценка</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ recommend_percentage }}%</div>
+            <div class="stat-label">Рекомендуют</div>
+        </div>
+    </div>
+
+    <div class="criteria-stats">
+        <h3>Оценка по критериям</h3>
+        <div class="criteria-grid">
+            <div class="criterion">
+                <div class="criterion-name">Качество продуктов</div>
+                <div class="criterion-rating">
+                    <div class="rating-bar">
+                        <div class="rating-fill" data-width="{{ quality_percentage|default:0 }}"></div>
+                    </div>
+                    <span class="criterion-value">{{ avg_quality|default:0 }}/5</span>
+                </div>
+            </div>
+            <div class="criterion">
+                <div class="criterion-name">Свежесть</div>
+                <div class="criterion-rating">
+                    <div class="rating-bar">
+                        <div class="rating-fill" data-width="{{ freshness_percentage|default:0 }}"></div>
+                    </div>
+                    <span class="criterion-value">{{ avg_freshness|default:0 }}/5</span>
+                </div>
+            </div>
+            <div class="criterion">
+                <div class="criterion-name">Обслуживание</div>
+                <div class="criterion-rating">
+                    <div class="rating-bar">
+                        <div class="rating-fill" data-width="{{ service_percentage|default:0 }}"></div>
+                    </div>
+                    <span class="criterion-value">{{ avg_service|default:0 }}/5</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reviews-grid">
+        {% if reviews %}
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-meta">
+                        <div class="review-date">{{ review.created_at|date:"d E Y" }}</div>
+                        <div class="review-rating">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.calculated_rating %}
+                                    <span class="star filled">★</span>
+                                {% else %}
+                                    <span class="star">☆</span>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="rating-value">{{ review.calculated_rating }}/5</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="review-title">{{ review.title }}</div>
+
+                <div class="detailed-ratings">
+                    <div class="detail-rating">
+                        <span class="detail-label">Качество:</span>
+                        <div class="mini-stars">
+                            {% for i in "12345" %}
+                                <span class="mini-star {% if forloop.counter <= review.product_quality %}filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="detail-rating">
+                        <span class="detail-label">Свежесть:</span>
+                        <div class="mini-stars">
+                            {% for i in "12345" %}
+                                <span class="mini-star {% if forloop.counter <= review.product_freshness %}filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="detail-rating">
+                        <span class="detail-label">Сервис:</span>
+                        <div class="mini-stars">
+                            {% for i in "12345" %}
+                                <span class="mini-star {% if forloop.counter <= review.service_quality %}filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if review.comment %}
+                <div class="review-content">
+                    {{ review.comment|linebreaks }}
+                </div>
+                {% endif %}
+                
+                <div class="review-footer">
+                    <div class="review-author">
+                        <div class="author-avatar">
+                            {{ review.author_name|slice:":1"|upper }}
+                        </div>
+                        <div class="author-info">
+                            <div class="author-name">{{ review.author_name }}</div>
+                            <div class="recommendation">
+                                {% if review.recommend >= 4 %}
+                                👍 Рекомендует
+                                {% elif review.recommend <= 2 %}
+                                👎 Не рекомендует
+                                {% else %}
+                                🤔 Не уверен(а)
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-reviews">
+                <div class="no-reviews-icon">💬</div>
+                <h3>Пока нет оценок</h3>
+                <p>Будьте первым, кто поделится впечатлениями о наших продуктах!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="reviewModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        
+        <div class="modal-header">
+            <h2>Оцените вашу покупку</h2>
+        </div>
+        
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'reviews:reviews' %}" class="review-form" id="reviewForm">
+                {% csrf_token %}
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <div class="current-user-info">
+                    <div class="user-badge">
+                        👤 <strong>{{ user.first_name }}</strong>
+                    </div>
+                    <p class="user-note">Отзыв будет опубликован от вашего имени</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="error-message">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="survey-section">
+                    <h3>Оцените по 5-балльной шкале:</h3>
+                    
+                    <div class="survey-item">
+                        <label>Качество продуктов *</label>
+                        <div class="survey-question">
+                            <p>Насколько вы довольны качеством наших продуктов?</p>
+                            <div class="rating-options">
+                                <div class="option-group">
+                                    <input type="radio" name="product_quality" value="5" id="quality5" required>
+                                    <label for="quality5" class="option-label">
+                                    
+                                        <span class="option-text">Отличное</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="product_quality" value="4" id="quality4">
+                                    <label for="quality4" class="option-label">
+                                       
+                                        <span class="option-text">Хорошее</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="product_quality" value="3" id="quality3">
+                                    <label for="quality3" class="option-label">
+                                        
+                                        <span class="option-text">Удовлетворительное</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="product_quality" value="2" id="quality2">
+                                    <label for="quality2" class="option-label">
+                                        
+                                        <span class="option-text">Плохое</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="product_quality" value="1" id="quality1">
+                                    <label for="quality1" class="option-label">
+                                       
+                                        <span class="option-text">Очень плохое</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="survey-item">
+                        <label>Свежесть продуктов *</label>
+                        <div class="survey-question">
+                            <p>Насколько свежими были продукты?</p>
+                            <div class="rating-options">
+                                <div class="option-group">
+                                    <input type="radio" name="product_freshness" value="5" id="freshness5" required>
+                                    <label for="freshness5" class="option-label">
+                                       
+                                        <span class="option-text">Максимальная свежесть</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="product_freshness" value="4" id="freshness4">
+                                    <label for="freshness4" class="option-label">
+                                        
+                                        <span class="option-text">Очень свежие</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="product_freshness" value="3" id="freshness3">
+                                    <label for="freshness3" class="option-label">
+                                        
+                                        <span class="option-text">Средняя свежесть</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="product_freshness" value="2" id="freshness2">
+                                    <label for="freshness2" class="option-label">
+                                     
+                                        <span class="option-text">Не очень свежие</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="product_freshness" value="1" id="freshness1">
+                                    <label for="freshness1" class="option-label">
+                                      
+                                        <span class="option-text">Несвежие</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="survey-item">
+                        <label>Качество обслуживания *</label>
+                        <div class="survey-question">
+                            <p>Как вам обслуживание в нашем магазине?</p>
+                            <div class="rating-options">
+                                <div class="option-group">
+                                    <input type="radio" name="service_quality" value="5" id="service5" required>
+                                    <label for="service5" class="option-label">
+                                       
+                                        <span class="option-text">Идеальный сервис</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="service_quality" value="4" id="service4">
+                                    <label for="service4" class="option-label">
+                                 
+                                        <span class="option-text">Очень хороший</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="service_quality" value="3" id="service3">
+                                    <label for="service3" class="option-label">
+                                       
+                                        <span class="option-text">Нормальный</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="service_quality" value="2" id="service2">
+                                    <label for="service2" class="option-label">
+                                      
+                                        <span class="option-text">Плохой</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="service_quality" value="1" id="service1">
+                                    <label for="service1" class="option-label">
+                               
+                                        <span class="option-text">Очень плохой</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="survey-item">
+                        <label>Рекомендация *</label>
+                        <div class="survey-question">
+                            <p>Порекомендуете ли вы нас друзьям?</p>
+                            <div class="rating-options">
+                                <div class="option-group">
+                                    <input type="radio" name="recommend" value="5" id="recommend5" required>
+                                    <label for="recommend5" class="option-label">
+                                    
+                                        <span class="option-text">Определенно да</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="recommend" value="4" id="recommend4">
+                                    <label for="recommend4" class="option-label">
+                                        
+                                        <span class="option-text">Вероятно да</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="recommend" value="3" id="recommend3">
+                                    <label for="recommend3" class="option-label">
+                            
+                                        <span class="option-text">Не уверен(а)</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="recommend" value="2" id="recommend2">
+                                    <label for="recommend2" class="option-label">
+                                       
+                                        <span class="option-text">Вероятно нет</span>
+                                    </label>
+                                </div>
+                                <div class="option-group">
+                                    <input type="radio" name="recommend" value="1" id="recommend1">
+                                    <label for="recommend1" class="option-label">
+                                       
+                                        <span class="option-text">Определенно нет</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
+                    {{ form.comment }}
+                    <div class="char-counter">
+                        <span id="charCount">0</span>/500 символов
+                    </div>
+                    {% if form.comment.errors %}
+                        <div class="error-message">{{ form.comment.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <div class="captcha-container">
+                        <label>Подтвердите, что вы не робот *</label>
+                        <div class="captcha-input">
+                            <span id="captcha" class="captcha-question"></span>
+                            <input type="text" id="captchaInput" placeholder="Введите ответ" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    Отправить оценку
+                </button>
+            </form>
+        {% else %}
+            <div class="login-required">
+                <div class="login-icon">🔒</div>
+                <h3>Требуется авторизация</h3>
+                <p>Для оставления отзыва необходимо войти в систему</p>
+                <a href="{% url 'login' %}?next={{ request.path }}" class="login-btn">
+                    Войти в аккаунт
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="{% static 'js/reviews.js' %}"></script>
+{% endblock %}

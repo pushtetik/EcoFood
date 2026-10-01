@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/contacts.css' %}">
+<section class="contacts-section py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-4">
+                <h1 class="fw-bold text-success">Наши контакты</h1>
+                <p>Мы всегда рады помочь вам и ответить на все вопросы</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 mb-4 mb-lg-0">
+                <div class="contacts-card">
+                    <h3 class="mb-3">Контактная информация</h3>
+                    
+                    <div class="contact-info-list">
+                        <div class="contact-info-item mb-3">
+                            <div class="contact-info-icon">📍</div>
+                            <div class="contact-info-content">
+                                <h5>Адрес</h5>
+                                <p>Высотная ул., 1, Санкт-Петербург</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item mb-3">
+                            <div class="contact-info-icon">📞</div>
+                            <div class="contact-info-content">
+                                <h5>Телефон</h5>
+                                <a href="tel:+79991234567">+7 (999) 123-45-67</a>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item mb-3">
+                            <div class="contact-info-icon">✉️</div>
+                            <div class="contact-info-content">
+                                <h5>Email</h5>
+                                <a href="mailto:info@ecofood.ru">info@ecofood.ru</a>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item mb-3">
+                            <div class="contact-info-icon">🕒</div>
+                            <div class="contact-info-content">
+                                <h5>Время работы</h5>
+                                <p>Пн-Пт: 9:00-21:00<br>Сб-Вс: 10:00-20:00</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="social-links mt-4">
+                        <h5 class="mb-2">Мы в соцсетях</h5>
+                        <div class="social-buttons">
+                            <a href="https://t.me/ecofood" target="_blank" class="social-btn">
+                                <span>Telegram</span>
+                            </a>
+                            <a href="https://wa.me/79991234567" target="_blank" class="social-btn">
+                                <span>WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="map-card">
+                    <h3 class="mb-3">Мы на карте</h3>
+                    <div class="map-container">
+                        <div style="position:relative;overflow:hidden;height:100%;">
+                            <a href="https://yandex.ru/maps/org/lakhta_tsentr/71693345624/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:0px;left:10px;">Лахта центр</a>
+                            <a href="https://yandex.ru/maps/2/saint-petersburg/category/business_center/184107509/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:14px;left:10px;">Бизнес-центр в Санкт‑Петербурге</a>
+                            <iframe 
+                                src="https://yandex.ru/map-widget/v1/?filter=alternate_vertical%3ARequestWindow&ll=30.175271%2C59.985669&mode=search&oid=71693345624&ol=biz&sctx=ZAAAAAgBEAAaKAoSCSEgX0AFz0JAEa4RwTi4GEtAEhIJDJQUWABT5j8RL00R4PQu0D8iBgABAgMEBSgKOABAAkgBagJydZ0BzczMPaABAKgBAL0BKGhf28IBDNjGhoqLArmMi6XQA4ICFdC70LDRhdGC0LAg0YbQtdC90YLRgIoCAJICATKaAgxkZXNrdG9wLW1hcHM%3D&sll=30.179115%2C59.985669&source=serp_navig&sspn=0.012653%2C0.006300&text=%D0%BB%D0%B0%D1%85%D1%82%D0%B0%20%D1%86%D0%B5%D0%BD%D1%82%D1%80&z=16.1" 
+                                width="100%" 
+                                height="100%" 
+                                frameborder="1" 
+                                allowfullscreen="true" 
+                                style="position:relative;border:none;">
+                            </iframe>
+                        </div>
+                    </div>
+
+                    <div class="map-details mt-3">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <div class="map-detail-item">
+                                    <h6>🚗 Парковка</h6>
+                                    <p>Бесплатная парковка на территории</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="map-detail-item">
+                                    <h6>🚇 Метро</h6>
+                                    <p>5 минут от станции "Беговая"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}
